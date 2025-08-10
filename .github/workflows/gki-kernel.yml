@@ -497,6 +497,7 @@ jobs:
             export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
             export LLVM=1
             export LLVM_IAS=1
+            cd "$CONFIG"
             make O=out gki_defconfig
             make -j$(nproc) O=out
             ccache --show-stats
