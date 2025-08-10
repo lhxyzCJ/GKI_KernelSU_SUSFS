@@ -126,7 +126,21 @@ jobs:
           curl https://storage.googleapis.com/git-repo-downloads/repo > ./git-repo/repo
           chmod a+rx ./git-repo/repo
           echo "REPO=$GITHUB_WORKSPACE/./git-repo/repo" >> $GITHUB_ENV
-
+     
+      
+      
+      
+      
+      - name: Install LLVM linker
+        run: sudo apt-get update && sudo apt-get install -y lld
+      
+      
+      
+      
+      
+      
+      
+      
       - name: 克隆 AnyKernel3 和其他依赖项
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
@@ -467,8 +481,7 @@ jobs:
               sed -i '/^CONFIG_LOCALVERSION=/ s/="\([^"]*\)"/="${{ inputs.version }}"/' ./arch/arm64/configs/gki_defconfig
             fi
           fi
-      - name: Install LLVM linker
-        run: sudo apt-get update && sudo apt-get install -y lld
+
   
       - name: Build with retry
         uses: nick-fields/retry@v3
