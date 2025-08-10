@@ -467,7 +467,9 @@ jobs:
               sed -i '/^CONFIG_LOCALVERSION=/ s/="\([^"]*\)"/="${{ inputs.version }}"/' ./arch/arm64/configs/gki_defconfig
             fi
           fi
-
+      - name: Install LLVM linker
+        run: sudo apt-get update && sudo apt-get install -y lld
+  
       - name: Build with retry
         uses: nick-fields/retry@v3
         with:
