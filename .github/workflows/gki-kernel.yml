@@ -176,7 +176,7 @@ jobs:
           # Initialize and sync kernel source
           echo "Initializing and syncing kernel source..."
           
-          git clone https://github.com/cupid-development/android_kernel_xiaomi_sm8450.git --depth=1 -b lineage-22.2 $CONFIG
+          git clone https://github.com/cupid-development/android_kernel_xiaomi_sm8450.git --depth=1 -b lineage-22.2 .
 
 
           
