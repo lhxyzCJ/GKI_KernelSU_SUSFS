@@ -500,20 +500,18 @@ jobs:
             sed -i '/KMI_SYMBOL_LIST_STRICT_MODE/d' ./build.config.gki.aarch64
 
             echo "Building the kernel..."
-            if [ -f "build/build.sh" ]; then
-              else
-                cd kernel
-                export PATH=$PWD/../clang/bin:$PATH
-                export ARCH=arm64
-                export SUBARCH=arm64
-                 export CC=clang
-                export CROSS_COMPILE=aarch64-linux-gnu-
-                export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-                export LLVM=1
-                export LLVM_IAS=1
-                make O=out gki_defconfig
-                make -j$(nproc) O=out
-            fi
+          
+            cd kernel
+            export PATH=$PWD/../clang/bin:$PATH
+            export ARCH=arm64
+            export SUBARCH=arm64
+            export CC=clang
+            export CROSS_COMPILE=aarch64-linux-gnu-
+            export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+            export LLVM=1
+            export LLVM_IAS=1
+            make O=out gki_defconfig
+            make -j$(nproc) O=out
             ccache --show-stats
 
 
