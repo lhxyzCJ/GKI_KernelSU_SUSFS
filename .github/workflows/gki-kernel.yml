@@ -517,8 +517,8 @@ jobs:
             sed -i '/KMI_SYMBOL_LIST_STRICT_MODE/d' ./build.config.gki.aarch64
 
             echo "Building the kernel..."
-            mkdir -p android12-5.10-236/out/android12-5.10/dist
-            export OUTPUT_DIR="android12-5.10-236/out/android12-5.10/dist" 
+            export BUILD_OUT="out/${{ inputs.android_version }}-${{ inputs.kernel_version }}"
+            mkdir -p "$BUILD_OUT/dist" 
             export PATH=$PWD/../clang/bin:$PATH
             export ARCH=arm64
             export SUBARCH=arm64
@@ -528,11 +528,11 @@ jobs:
             export LLVM=1
             export LLVM_IAS=1
             
-            make O=out gki_defconfig
-            make -j$(nproc) O=out
-            cp out/arch/arm64/boot/Image "$OUTPUT_DIR/" || true
-            cp out/arch/arm64/boot/Image.gz "$OUTPUT_DIR/" || true
-            cp out/arch/arm64/boot/dtb "$OUTPUT_DIR/" || true
+            make O="$BUILD_OUT" gki_defconfig
+            make -j"$(nproc)" O="$BUILD_OUT"
+            cp "$BUILD_OUT/arch/arm64/boot/Image" "$BUILD_OUT/dist/" || true
+            cp "$BUILD_OUT/arch/arm64/boot/Image.gz" "$BUILD_OUT/dist/" || true
+            cp "$BUILD_OUT/arch/arm64/boot/dtb" "$BUILD_OUT/dist/" || true
             ccache --show-stats
 
 
