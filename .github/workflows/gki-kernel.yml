@@ -480,22 +480,20 @@ jobs:
           echo "CURRENT_TIME=$CURRENT_TIME"
           perl -pi -e "s{UTS_VERSION=\"\\\$\(echo \\\$UTS_VERSION \\\$CONFIG_FLAGS \\\$TIMESTAMP \\| cut -b -\\\$UTS_LEN\)\"}{UTS_VERSION=\"#1 SMP PREEMPT $CURRENT_TIME\"}" ./scripts/mkcompile_h
 
-          # Apply specific Makefile modification for kernel versions 6.1 and 6.6 only
-          # if [ "${{ inputs.kernel_version }}" = "6.1" ] || [ "${{ inputs.kernel_version }}" = "6.6" ]; then
-          #   sed -i -e "s|\$(preempt-flag-y) \"\$(build-timestamp)\"|\$(preempt-flag-y) \"$CURRENT_TIME\"|" ./init/Makefile
+
+
+          # 下面这一段都无效，对于lineageOS，你需要单独修改makefile，以下提到的所有文件在sm8450源码中都不存在
+          # if [ -f "build/build.sh" ]; then
+          #   sed -i 's/-dirty//' ./scripts/setlocalversion
+          # else
+          #   # sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' ./BUILD.bazel
+          #     # rm -rf ./android/abi_gki_protected_exports_*
+          #   # sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
+          #   # sed -E -i '/^CONFIG_LOCALVERSION=/ s/(.*)"$/\1"/' ./arch/arm64/configs/gki_defconfig
+          #   if [ ! -z ${{ inputs.version }} ]; then
+          #     sed -i '/^CONFIG_LOCALVERSION=/ s/="\([^"]*\)"/="${{ inputs.version }}"/' ./arch/arm64/configs/gki_defconfig
+          #   fi
           # fi
-          
-          if [ -f "build/build.sh" ]; then
-            sed -i 's/-dirty//' ./scripts/setlocalversion
-          else
-            # sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' ./BUILD.bazel
-              rm -rf ./android/abi_gki_protected_exports_*
-            # sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
-            # sed -E -i '/^CONFIG_LOCALVERSION=/ s/(.*)"$/\1"/' ./arch/arm64/configs/gki_defconfig
-            if [ ! -z ${{ inputs.version }} ]; then
-              sed -i '/^CONFIG_LOCALVERSION=/ s/="\([^"]*\)"/="${{ inputs.version }}"/' ./arch/arm64/configs/gki_defconfig
-            fi
-          fi
 
   
       - name: Build with retry
