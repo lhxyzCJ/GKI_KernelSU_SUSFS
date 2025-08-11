@@ -142,7 +142,10 @@ jobs:
           curl https://storage.googleapis.com/git-repo-downloads/repo > ./git-repo/repo
           chmod a+rx ./git-repo/repo
           echo "REPO=$GITHUB_WORKSPACE/./git-repo/repo" >> $GITHUB_ENV
-
+      
+      - name: Install LLVM linker
+        run: sudo apt-get install -y clang lld llvm llvm-dev
+      
       - name: 克隆 AnyKernel3 和其他依赖项
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
@@ -502,12 +505,25 @@ jobs:
             sed -i '/KMI_SYMBOL_LIST_STRICT_MODE/d' ./build.config.gki.aarch64
 
             echo "Building the kernel..."
-            if [ -f "build/build.sh" ]; then
-              LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh CC="/usr/bin/ccache clang" || exit 1
-            else
-              tools/bazel build --disk_cache=/home/runner/.cache/bazel --config=fast --lto=thin //common:kernel_aarch64_dist || exit 1
-            fi
-            ccache --show-stats
+
+            echo "Building the kernel..."
+            export BUILD_OUT="out/${{ inputs.android_version }}-${{ inputs.kernel_version }}"
+            mkdir -p "$BUILD_OUT/dist" 
+            export PATH=$PWD/../clang/bin:$PATH
+            export ARCH=arm64
+            export SUBARCH=arm64
+            export CC=clang
+            export CROSS_COMPILE=aarch64-linux-gnu-
+            export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+            export LLVM=1
+            export LLVM_IAS=1
+            
+            make O="$BUILD_OUT" gki_defconfig
+            make -j"$(nproc)" O="$BUILD_OUT"
+            cp "$BUILD_OUT/arch/arm64/boot/Image" "$BUILD_OUT/dist/" || true
+            cp "$BUILD_OUT/arch/arm64/boot/Image.gz" "$BUILD_OUT/dist/" || true
+            cp "$BUILD_OUT/arch/arm64/boot/dtb" "$BUILD_OUT/dist/" || true
+
 
             
       - name: 修补 Image 文件 安卓12和安卓13(仅限sukisu)
