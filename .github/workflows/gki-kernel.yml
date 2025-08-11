@@ -517,8 +517,8 @@ jobs:
             sed -i '/KMI_SYMBOL_LIST_STRICT_MODE/d' ./build.config.gki.aarch64
 
             echo "Building the kernel..."
-          
-            
+            mkdir -p android12-5.10-236/out/android12-5.10/dist
+            export OUTPUT_DIR="android12-5.10-236/out/android12-5.10/dist" 
             export PATH=$PWD/../clang/bin:$PATH
             export ARCH=arm64
             export SUBARCH=arm64
@@ -530,6 +530,9 @@ jobs:
             
             make O=out gki_defconfig
             make -j$(nproc) O=out
+            cp out/arch/arm64/boot/Image "$OUTPUT_DIR/" || true
+            cp out/arch/arm64/boot/Image.gz "$OUTPUT_DIR/" || true
+            cp out/arch/arm64/boot/dtb "$OUTPUT_DIR/" || true
             ccache --show-stats
 
 
