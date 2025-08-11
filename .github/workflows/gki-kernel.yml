@@ -192,7 +192,7 @@ jobs:
           # Initialize and sync kernel source
           echo "Initializing and syncing kernel source..."
           
-          git clone https://github.com/LineageOS/android_kernel_xiaomi_sm8450.git --depth=1 -b lineage-22.2 .
+          git clone https://github.com/Evolution-X-Devices/kernel_xiaomi_sm8450.git --depth=1 -b bka .
 
 
           
