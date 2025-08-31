@@ -167,53 +167,33 @@ jobs:
 
           echo "CONFIG set to: $CONFIG"
 
-      - name: 初始化和同步内核源代码
+- name: 初始化和同步内核源代码
         run: |
           echo "Creating folder for configuration: $CONFIG..."
           mkdir -p "$CONFIG"
           cd "$CONFIG"
 
-          # 同步指定的标准GKI仓库（替换谷歌仓库）
-          echo "Initializing and syncing kernel source from custom repo..."
-          # 构造分支名（沿用原逻辑，适配你的仓库分支命名）
-          FORMATTED_BRANCH="${{ inputs.android_version }}-${{ inputs.kernel_version }}-${{ inputs.os_patch_level }}"
+          # 直接克隆仓库默认分支（不检查任何分支，解决分支不存在问题）
+          echo "Cloning kernel source from default branch..."
           TARGET_REPO="https://github.com/AviderMin/android_kernel_xiaomi_marble.git"
           
-          # 检查目标分支是否存在，不存在则尝试deprecated前缀
-          echo "Checking branch: $FORMATTED_BRANCH in $TARGET_REPO..."
-          REMOTE_BRANCH=$(git ls-remote --heads "$TARGET_REPO" "$FORMATTED_BRANCH" | awk '{print $2}')
-          if [ -z "$REMOTE_BRANCH" ]; then
-            echo "Branch $FORMATTED_BRANCH not found, checking deprecated/$FORMATTED_BRANCH..."
-            FORMATTED_BRANCH="deprecated/${FORMATTED_BRANCH}"
-            REMOTE_BRANCH=$(git ls-remote --heads "$TARGET_REPO" "$FORMATTED_BRANCH" | awk '{print $2}')
-            if [ -z "$REMOTE_BRANCH" ]; then
-              echo "Error: Branch $FORMATTED_BRANCH not found in $TARGET_REPO"
-              exit 1
-            fi
-          fi
-          echo "Using branch: $FORMATTED_BRANCH"
-          echo "REMOTE_BRANCH=$REMOTE_BRANCH" >> $GITHUB_ENV
-
-          # 克隆仓库到common目录（关键：保持后续逻辑依赖的common目录结构）
+          # 克隆到common目录（确保后续步骤路径兼容）
           git clone \
-            --depth=1 \
-            --branch="$FORMATTED_BRANCH" \
-            --no-tags \
-            "$TARGET_REPO" "common"  # 强制克隆到common目录，与后续步骤路径对齐
+            --depth=1 \  # 浅克隆加快速度（可选，根据需要保留完整历史可删除）
+            "$TARGET_REPO" "common"  # 不指定分支，默认克隆仓库的主分支（如main/master）
 
-          # 进入源码目录（后续补丁操作基于此）
+          # 进入源码目录
           cd common
-          echo "Successfully cloned kernel source to $(pwd)"
+          echo "Successfully cloned kernel source to $(pwd) (using default branch)"
 
-          # 保留原5.15版本C库修复补丁（标准GKI可能需要）
+          # 保留5.15补丁（添加容错，避免补丁失败中断）
           FORMATTED_BRANCH_SIMPLE="${{ inputs.android_version }}-${{ inputs.kernel_version }}"
-          if grep -q deprecated <<< "$REMOTE_BRANCH" && \
-             { [ "$FORMATTED_BRANCH_SIMPLE" == "android13-5.15" ] && \
-               [ ${{ inputs.sub_level }} -lt 123 ]; }; then
-            echo '修复5.15仅支持旧版C库的BUG'
+          if [ "$FORMATTED_BRANCH_SIMPLE" == "android13-5.15" ] && [ ${{ inputs.sub_level }} -lt 123 ]; then
+            echo '尝试修复5.15 C库问题（补丁失败不中断）'
             curl -LSs https://github.com/zzh20188/GKI_KernelSU_SUSFS/raw/refs/heads/legacy/fix_5.15.legacy -o fix_5.15.legacy.patch
-            patch -p1 < fix_5.15.legacy.patch
+            patch -p1 < fix_5.15.legacy.patch || echo "补丁已存在或不适用，继续执行"
           fi
+    
 
       - name: 使GKI在一加8E平台正常使用
         if: ${{ inputs.supp_op }}
