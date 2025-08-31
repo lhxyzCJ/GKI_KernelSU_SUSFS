@@ -182,7 +182,7 @@ jobs:
           # Initialize and sync kernel source
           echo "Initializing and syncing kernel source..."
           
-          git clone https://github.com/Evolution-X-Devices/kernel_xiaomi_sm8450.git --depth=1 -b bka .
+          git clone https://github.com/AviderMin/android_kernel_xiaomi_marble.git .
 
 
           
@@ -472,18 +472,17 @@ jobs:
 
 
 
-          # 下面这一段都无效，对于lineageOS，你需要单独修改makefile，以下提到的所有文件在sm8450源码中都不存在
-          # if [ -f "build/build.sh" ]; then
-          #   sed -i 's/-dirty//' ./scripts/setlocalversion
-          # else
-          #   # sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' ./BUILD.bazel
-          #     # rm -rf ./android/abi_gki_protected_exports_*
-          #   # sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
-          #   # sed -E -i '/^CONFIG_LOCALVERSION=/ s/(.*)"$/\1"/' ./arch/arm64/configs/gki_defconfig
-          #   if [ ! -z ${{ inputs.version }} ]; then
-          #     sed -i '/^CONFIG_LOCALVERSION=/ s/="\([^"]*\)"/="${{ inputs.version }}"/' ./arch/arm64/configs/gki_defconfig
-          #   fi
-          # fi
+          if [ -f "build/build.sh" ]; then
+            sed -i 's/-dirty//' ./scripts/setlocalversion
+          else
+            # sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' ./BUILD.bazel
+              # rm -rf ./android/abi_gki_protected_exports_*
+            # sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
+            # sed -E -i '/^CONFIG_LOCALVERSION=/ s/(.*)"$/\1"/' ./arch/arm64/configs/gki_defconfig
+            if [ ! -z ${{ inputs.version }} ]; then
+              sed -i '/^CONFIG_LOCALVERSION=/ s/="\([^"]*\)"/="${{ inputs.version }}"/' ./arch/arm64/configs/gki_defconfig
+            fi
+          fi
 
   
       - name: Build with retry
