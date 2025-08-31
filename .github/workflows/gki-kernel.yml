@@ -170,10 +170,11 @@ jobs:
         run: |
   
            TARGET_DIR="$CONFIG/common"
+           echo "当前 CONFIG 变量值：$CONFIG"  # 调试：查看 $CONFIG 是否正确
+           echo "预期克隆目录 TARGET_DIR：$TARGET_DIR"  # 调试：查看预期路径
+           git clone https://github.com/AviderMin/android_kernel_xiaomi_marble.git --depth=1  "$TARGET_DIR"
 
-           git clone https://github.com/AviderMin/android_kernel_xiaomi_marble.git "$TARGET_DIR"
-
-      
+           cd "$CONFIG"
            cd common
            echo "Successfully cloned kernel source to $(pwd) (using default branch)"
 
