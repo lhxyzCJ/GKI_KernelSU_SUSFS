@@ -167,7 +167,7 @@ jobs:
 
           echo "CONFIG set to: $CONFIG"
 
-- name: 初始化和同步内核源代码
+      - name: 初始化和同步内核源代码
         run: |
           echo "Creating folder for configuration: $CONFIG..."
           mkdir -p "$CONFIG"
