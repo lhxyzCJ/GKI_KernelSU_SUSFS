@@ -166,34 +166,17 @@ jobs:
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
 
           echo "CONFIG set to: $CONFIG"
-
-      - name: 初始化和同步内核源代码
+      - name: 克隆仓库到指定目录（自动创建不存在的目录）
         run: |
-          echo "Creating folder for configuration: $CONFIG..."
-          mkdir -p "$CONFIG"
-          cd "$CONFIG"
+  
+           TARGET_DIR="$CONFIG/common"
 
-          # 直接克隆仓库默认分支（不检查任何分支，解决分支不存在问题）
-          echo "Cloning kernel source from default branch..."
-          TARGET_REPO="https://github.com/AviderMin/android_kernel_xiaomi_marble.git"
-          
-          # 克隆到common目录（确保后续步骤路径兼容）
-          git clone \
-            --depth=1 \  # 浅克隆加快速度（可选，根据需要保留完整历史可删除）
-            "$TARGET_REPO" "common"  # 不指定分支，默认克隆仓库的主分支（如main/master）
+           git clone https://github.com/AviderMin/android_kernel_xiaomi_marble.git "$TARGET_DIR"
 
-          # 进入源码目录
-          cd common
-          echo "Successfully cloned kernel source to $(pwd) (using default branch)"
+      
+           cd common
+           echo "Successfully cloned kernel source to $(pwd) (using default branch)"
 
-          # 保留5.15补丁（添加容错，避免补丁失败中断）
-          FORMATTED_BRANCH_SIMPLE="${{ inputs.android_version }}-${{ inputs.kernel_version }}"
-          if [ "$FORMATTED_BRANCH_SIMPLE" == "android13-5.15" ] && [ ${{ inputs.sub_level }} -lt 123 ]; then
-            echo '尝试修复5.15 C库问题（补丁失败不中断）'
-            curl -LSs https://github.com/zzh20188/GKI_KernelSU_SUSFS/raw/refs/heads/legacy/fix_5.15.legacy -o fix_5.15.legacy.patch
-            patch -p1 < fix_5.15.legacy.patch || echo "补丁已存在或不适用，继续执行"
-          fi
-    
 
       - name: 使GKI在一加8E平台正常使用
         if: ${{ inputs.supp_op }}
