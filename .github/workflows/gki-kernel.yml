@@ -60,7 +60,6 @@ jobs:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
       CCACHE_NOHASHDIR: "true"
       CCACHE_HARDLINK: "true"
-
     steps:
       - name: Set swap space
         uses: pierotofy/set-swap-space@master
