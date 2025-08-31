@@ -382,7 +382,7 @@ jobs:
           echo "更改为配置目录: $CONFIG..."
           cd "$CONFIG"
           echo "Adding configuration settings to gki_defconfig..."
-          CONFIG_FILE="$CONFIG/common/arch/arm64/configs/gki_defconfig"
+          CONFIG_FILE="$CONFIG/common/arch/arm64/configs/marble_defconfig"
 
           # Add KSU configuration settings
           echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
