@@ -477,10 +477,6 @@ jobs:
             # 5. 加载标准GKI配置（根据仓库实际配置名调整，此处用gki_defconfig）
             make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- marble_defconfig
 
-            # 6. 多线程编译（用ccache加速，适配原ccache配置）
-
-             make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- gki_defconfig
-
             make ARCH=arm64 \
                  CROSS_COMPILE=aarch64-linux-gnu- \
                  CC="ccache aarch64-linux-gnu-gcc" \
